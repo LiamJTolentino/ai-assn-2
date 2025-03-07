@@ -5,10 +5,10 @@ import pandas as pd
 from time import time_ns
 
 def run_test(alg,scramble):
-    """Solves a scramble with the given Solver object and returns the number of nodes visited and the time in nanoseconds taken to solve the puzzle"""
-    start = time_ns()
+    """Solves a scramble with the given Solver object and returns the number of nodes visited and the time in milliseconds taken to solve the puzzle"""
+    start = time_ns()/1000000
     alg.solve(scramble)
-    end = time_ns()
+    end = time_ns()/1000000
     elapsed = end - start
     return len(alg.visited),elapsed
 
@@ -38,19 +38,19 @@ if __name__=='__main__':
 
     # Create the puzzle that will be used to generate scrambled puzzles
     Scrambler = Puzzle()
-    scrambles = []
     print(f"Now generating {num_scrambles} unique scrambled puzzles...")
     for i in range(num_scrambles):
         Scrambler.shuffle()
-        print(f"Generated the puzzle:\n{Scrambler}")
-        scrambles.append(Scrambler.get_state_str())
+        print(f"Solving the puzzle:\n{Scrambler}")
 
-    print("Successfully generated the scrambles")
-    # Test each scramble with each algorithm and record the data
-    for scramble in scrambles:
+        scramble = Scrambler.get_state_str()
+
         n_UCS,t_UCS = run_test(UCS,scramble)
+        print(f"UCS solved the puzzle in {t_UCS:.3f}ms and visited {n_UCS} nodes")
         n_BFS,t_BFS = run_test(BFS,scramble)
+        print(f"BFS solved the puzzle in {t_BFS:.3f}ms and visited {n_BFS} nodes")
         n_A,t_A = run_test(ASTAR,scramble)
+        print(f"A* solved the puzzle in {t_A:.3f}ms and visited {n_A} nodes")
 
         # Create row of data
         new_row = pd.Series({
@@ -64,5 +64,22 @@ if __name__=='__main__':
         })
         data.loc[len(data)] = new_row
 
+    print("==================\n" + 
+          "--Final Results--\n" +
+          "==================")
+    for alg in ["UCS","BFS","A*"]:
+        node_data = data[f"Nodes {alg}"]
+        time_data = data[f"Time {alg}"]
+        print(f"\n{alg}:")
+        print("\tNumber of Nodes visited:")
+        print(f"\t\tWorst: {node_data.max()}")
+        print(f"\t\tBest: {node_data.min()}")
+        print(f"\t\tAverage: {node_data.mean()}")
+
+        print("\tTime taken to solve:")
+        print(f"\t\tWorst: {time_data.max():.3f}ms")
+        print(f"\t\tBest: {time_data.min():.3f}ms")
+        print(f"\t\tAverage: {time_data.mean():.3f}ms")
+        
     data.to_csv("Tests.csv")
 
