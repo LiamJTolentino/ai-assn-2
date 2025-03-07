@@ -3,6 +3,7 @@ from Solver import *
 import sys
 import pandas as pd
 from time import time_ns
+import matplotlib.pyplot as plt
 
 def run_test(alg,scramble):
     """Solves a scramble with the given Solver object and returns the number of nodes visited and the time in milliseconds taken to solve the puzzle"""
