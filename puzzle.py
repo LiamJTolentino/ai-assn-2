@@ -201,7 +201,7 @@ class Puzzle:
             square = self.state[index] # The number to display
             if real_position in [3,6]: # Next line
                 output += "|\n"
-            output += f"|{square if square!=0 else " "}"
+            output += f"|{square if square!=0 else ' '}"
         return output + "|\n" +"="*7 # Gotta include that last border
     
 if __name__=="__main__":
