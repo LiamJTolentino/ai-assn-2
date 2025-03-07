@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 from time import time_ns
 import matplotlib.pyplot as plt
+import numpy as np
 
 def run_test(alg,scramble):
     """Solves a scramble with the given Solver object and returns the number of nodes visited and the time in milliseconds taken to solve the puzzle"""
@@ -13,8 +14,54 @@ def run_test(alg,scramble):
     elapsed = end - start
     return len(alg.visited),elapsed
 
+# This function was mostly AI generated, but that's mainly because I suck with matplotlib
+def plot_distributions(df, prefix, title,units):
+    """Generates a distribution graph for a specific set of columns
+
+    Args:
+        df (DataFrame): DataFrame containing the data
+        prefix (str): Prefix of the column name representing what data is stored there (Nodes or Time)
+        title (str): Title displayed at the top of the graph
+        units (str): Units of the column in question
+    """
+    # Filter columns based on prefix
+    columns = [col for col in df.columns if col.startswith(prefix)]
+    
+    # Calculate means and standard deviations
+    means = df[columns].mean()
+    stds = df[columns].std()
+    
+    # Plot histograms and bell curves
+    plt.figure(figsize=(12, 8))
+    colors = ['#395c78', '#9d312f', '#f08149']  # Hex colors for each algorithm
+
+    for i, column in enumerate(columns):
+        # Plot histogram
+        plt.hist(df[column], bins=30, alpha=0.5, color=colors[i], density=True, label=f'{column} Histogram')
+        
+        # Plot bell curve
+        x = np.linspace(df[column].min(), df[column].max(), 1000)
+        y = (1 / (stds[column] * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - means[column]) / stds[column])**2)
+        plt.plot(x, y, color=colors[i], linestyle='dashed', linewidth=2, label=f'{column} Bell Curve')
+
+    # Add labels and title
+    plt.xlabel(f'Value ({units})')
+    plt.ylabel('Density')
+    plt.title(title)
+    plt.legend()
+
+    # Add a text box with means and standard deviations
+    textstr = '\n'.join([f'{col.replace(prefix,"")}:\n  μ={means[col]:.2f}, σ={stds[col]:.2f}\n  Best: {df[col].min()}\n  Worst: {df[col].max()}' for col in columns])
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    plt.text(0.05, 0.95, textstr, transform=plt.gca().transAxes, fontsize=10,
+             verticalalignment='top', bbox=props)
+
+    # Show the plot
+    plt.show()
+
 if __name__=='__main__':
     print('hi')
+    random.seed(10)
     try:
         num_scrambles = int(sys.argv[1])
     except:
@@ -81,6 +128,11 @@ if __name__=='__main__':
         print(f"\t\tWorst: {time_data.max():.3f}ms")
         print(f"\t\tBest: {time_data.min():.3f}ms")
         print(f"\t\tAverage: {time_data.mean():.3f}ms")
+        
+    # Matplotlib stuff
+
+    plot_distributions(data,"Nodes","Distribution of the Number of Nodes Visited by Each Algorithm","Nodes")
+    plot_distributions(data,"Time","Distribution of Time Taken to solve with each algorithm","ms")
         
     data.to_csv("Tests.csv")
 
