@@ -18,7 +18,7 @@ class Solver:
         """Runs the algorithm to solve the puzzle state given by initial_position string"""
         self.reset()
         self.puzzle.set_state(initial_position)
-        logging.info(f"Now attempting to solve:\n{self.puzzle}")
+        # logging.info(f"Now attempting to solve:\n{self.puzzle}")
         if self.puzzle.is_solved():
             return
         if not(self.puzzle.is_solvable()):
@@ -27,14 +27,14 @@ class Solver:
         self.create_node(0)
 
         while not(self.open.empty()) and not(self.found_solution):
-            logging.info(f"{'~~|~~'*10}\n{self.open.qsize()} objects in queue\n")
-            for i in self.open.queue[:5]:
-                logging.info(f"\t{i}")
+            # logging.info(f"{'~~|~~'*10}\n{self.open.qsize()} objects in queue\n")
+            # for i in self.open.queue[:5]:
+            #     logging.info(f"\t{i}")
             self.expand()
 
-        logging.info(f"<{'=---='*50}>")
-        logging.info(f"Solved puzzle:\n{self.puzzle}")
-        logging.info(f"Visited {len(self.visited)} nodes")
+        # logging.info(f"<{'=---='*50}>")
+        # logging.info(f"Solved puzzle:\n{self.puzzle}")
+        # logging.info(f"Visited {len(self.visited)} nodes")
 
     def reset(self):
         """Resets the solver to prepare for another puzzle"""
@@ -50,12 +50,12 @@ class Solver:
         self.visited.append(node)
         next_depth = node.depth + 1 # Next nodes will have more depth
         self.puzzle.set_state(node.puzzle_state)
-        logging.info(f"<{'='*30}>\nNode at depth {node.depth}:\n{self.puzzle}\n{'='*30}")
-        logging.info(f"Hamming Distance: {self.puzzle.get_unsolved_pieces()}")
-        logging.info(f"Manhattan Distance: {self.puzzle.total_manhattan_distance()}")
-        logging.info(f"Nilsson Score: {self.puzzle.nilsson_score()}")
-        logging.info(f"Inversions: {self.puzzle.count_inversions()}")
-        logging.info(f"Moves:{node.move_sequence()}")
+        # logging.info(f"<{'='*30}>\nNode at depth {node.depth}:\n{self.puzzle}\n{'='*30}")
+        # logging.info(f"Hamming Distance: {self.puzzle.get_unsolved_pieces()}")
+        # logging.info(f"Manhattan Distance: {self.puzzle.total_manhattan_distance()}")
+        # logging.info(f"Nilsson Score: {self.puzzle.nilsson_score()}")
+        # logging.info(f"Inversions: {self.puzzle.count_inversions()}")
+        # logging.info(f"Moves:{node.move_sequence()}")
         if self.puzzle.is_solved():
             self.found_solution = True
             logging.info(f"Solution: {node.move_sequence()}")
@@ -65,10 +65,10 @@ class Solver:
         if node.prev_pos in next_moves: # Remove the previous position from the list so we don't go back to it
             next_moves.remove(node.prev_pos)
         
-        logging.info(f"{len(next_moves)} available moves:")
+        # logging.info(f"{len(next_moves)} available moves:")
 
         for move in next_moves: # Now we go through the next valid moves and create new states
-            logging.info(f"\nPuzzle after moving {self.puzzle.state[move]} to the empty square:")
+            # logging.info(f"\nPuzzle after moving {self.puzzle.state[move]} to the empty square:")
             self.puzzle.move(move)
             self.create_node(next_depth,prev_pos,parent=node)
             self.puzzle.move(prev_pos) # Return the puzzle to the previous position to add the next move
@@ -94,7 +94,7 @@ class Solver:
         
         self.past_positions.add(self.puzzle.get_state_str())
         node = Node(self.puzzle.get_state_str(),depth,prev_pos,parent)
-        logging.info(f"{self.puzzle}\nCost: {cost}\nDepth: {depth}")
+        # logging.info(f"{self.puzzle}\nCost: {cost}\nDepth: {depth}")
         self.open.put((cost,node)) # Place the node into the priority queue
 
 class Node:
@@ -135,6 +135,7 @@ if __name__=="__main__":
 
     UCS = Solver()
     UCS.solve(puzz)
+    logging.info(f"Visited {len(UCS.visited)} nodes")
 
     logging.info(f"{'='*50}\nBest-first Search\n{'='*100}")
     BFS = Solver("BFS")

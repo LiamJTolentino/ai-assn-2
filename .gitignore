@@ -2,3 +2,4 @@ ignore/*
 *.pdf
 *.log
 __pycache__/*
+*.csv
